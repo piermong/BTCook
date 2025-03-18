@@ -1,47 +1,80 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using BTCook;
-using MySql.Data.MySqlClient;
 
-namespace BTCook
+public class Arc
 {
-        class Arc
+    public Station Depart { get; set; }
+    public Station Arrivee { get; set; }
+    public string Ligne { get; set; }
+    public double Distance { get; set; }
+    public double Temps { get; set; }
+    public Color CouleurLigne { get; set; } // Ajout de la couleur
+
+
+    public Arc(Station depart, Station arrivee, double temps)
+    {
+        Depart = depart;
+        Arrivee = arrivee;
+        string ligne = depart.DeterminerLigne();
+
+        Color couleurLigne = ObtenirCouleurLigne(ligne);
+        Ligne = ligne;
+        Distance = CalculerDistance(depart, arrivee);
+        Temps = temps;
+        CouleurLigne = ObtenirCouleurLigne(ligne);
+    }
+
+
+    public static Color ObtenirCouleurLigne(string ligne)
+    {
+        switch (ligne)
         {
-        public Station Depart { get; set; }
-        public Station Arrivee { get; set; }
-        public string Ligne { get; set; }
-        public double Distance { get; } // Distance en kilomètres
-
-        public Arc(Station depart, Station arrivee, string ligne)
-        {
-            Depart = depart;
-            Arrivee = arrivee;
-            Ligne = ligne;
-            Distance = CalculerDistance(depart.Latitude, depart.Longitude, arrivee.Latitude, arrivee.Longitude);
-        }
-
-        private double CalculerDistance(double lat1, double lon1, double lat2, double lon2)
-        {
-            const double R = 6371; // Rayon de la Terre en km
-
-            // Conversion des degrés en radians
-            double phi1 = lat1 * Math.PI / 180;
-            double phi2 = lat2 * Math.PI / 180;
-            double deltaPhi = (lat2 - lat1) * Math.PI / 180;
-            double deltaLambda = (lon2 - lon1) * Math.PI / 180;
-
-            // Formule de Haversine
-            double a = Math.Sin(deltaPhi / 2) * Math.Sin(deltaPhi / 2) +
-                       Math.Cos(phi1) * Math.Cos(phi2) *
-                       Math.Sin(deltaLambda / 2) * Math.Sin(deltaLambda / 2);
-
-            double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
-
-            return R * c; // Distance en kilomètres
+            case "1": return Color.Yellow;
+            case "2": return Color.Blue;
+            case "3": return Color.Olive;
+            case "3bis": return Color.SkyBlue;
+            case "4": return Color.DarkMagenta;
+            case "5": return Color.OrangeRed;
+            case "6": return Color.PaleGreen;
+            case "7": return Color.Pink;
+            case "7bis": return Color.Chartreuse;
+            case "8": return Color.Violet;
+            case "9": return Color.YellowGreen;
+            case "10": return Color.Orange;
+            case "11": return Color.SaddleBrown;
+            case "12": return Color.DarkGreen;
+            case "13": return Color.DeepSkyBlue;
+            case "14": return Color.MediumPurple;
+            default: return Color.Gray; // Couleur par défaut si la ligne est inconnue
         }
     }
+
+
+
+    private double CalculerDistance(Station s1, Station s2)
+    {
+        const double R = 6371; // Rayon de la Terre en km
+
+        double lat1 = s1.Latitude * Math.PI / 180;
+        double lon1 = s1.Longitude * Math.PI / 180;
+        double lat2 = s2.Latitude * Math.PI / 180;
+        double lon2 = s2.Longitude * Math.PI / 180;
+
+        double deltaLat = lat2 - lat1;
+        double deltaLon = lon2 - lon1;
+
+        double a = Math.Sin(deltaLat / 2) * Math.Sin(deltaLat / 2) +
+                   Math.Cos(lat1) * Math.Cos(lat2) *
+                   Math.Sin(deltaLon / 2) * Math.Sin(deltaLon / 2);
+
+        double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+
+        return R * c; // Distance en kilomètres
+
+    }
+
 }
