@@ -15,6 +15,11 @@ namespace BTCook
         public double Longitude { get; set; }
         public string Commune { get; set; }
         public double tempsChangement { get; set; }
+        public float X { get; set; } // Coordonnée sur l'écran
+        public float Y { get; set; }
+        public double Poids { get; set; } 
+        public Station StationPrécé { get; set; }
+
 
         public Station(string nom, string iDstation, double lat, double lon, string commune, double tempsChangement)
         {
@@ -24,8 +29,8 @@ namespace BTCook
             Commune = commune;
             IDstation = iDstation;
             this.tempsChangement = tempsChangement;
+            StationPrécé = null;
         }
-
 
         public string DeterminerLigne()
         {
