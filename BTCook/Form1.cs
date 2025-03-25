@@ -37,6 +37,13 @@ namespace BTCook
             this.WindowState = FormWindowState.Maximized; // Maximiser la fenêtre
             Console.WriteLine($"Nombre de stations : {carte.Stations.Count}");
             Console.WriteLine($"Nombre d'arcs : {carte.Arcs.Count}");
+            Console.WriteLine("\n\n");
+            Console.WriteLine("     Dijkstra : ");
+            carte.AfficherCheminOptimal(carte.Dijkstra("Porte Maillot", "Nationale"));
+            Console.WriteLine("\n\n");
+            Console.WriteLine("     Bellman Ford : ");
+            carte.AfficherCheminOptimal(carte.BellmanFord("Porte Maillot", "Nationale"));
+
         }
 
         private void DessinerGraphe(object sender, PaintEventArgs e)
@@ -44,52 +51,64 @@ namespace BTCook
             Graphics g = e.Graphics;
             g.Clear(Color.White);
 
-            // Normalisation des coordonnées pour afficher le graphe correctement
-            double minLat = double.MaxValue, maxLat = double.MinValue;
-            double minLon = double.MaxValue, maxLon = double.MinValue;
+            double minLat = double.MaxValue; // en mettant à 1000 minlat ne peut que diminuer
+            double maxLat = 0; // en mettant à 0 maxlat ne peut qu'auguementer 
+            double minLon = double.MaxValue ;
+            double maxLon = 0;
 
             foreach (var station in carte.Stations)
             {
+                // Mise à jour des valeurs minimales et maximales de latitude
                 if (station.Latitude < minLat) minLat = station.Latitude;
                 if (station.Latitude > maxLat) maxLat = station.Latitude;
+                // Mise à jour des valeurs minimales et maximales de longitude
                 if (station.Longitude < minLon) minLon = station.Longitude;
                 if (station.Longitude > maxLon) maxLon = station.Longitude;
             }
 
 
+            // Définition des marges et des dimensions de la zone de dessin
             int marge = 50;
             int largeurEcran = this.ClientSize.Width - 2 * marge;
             int hauteurEcran = this.ClientSize.Height - 2 * marge;
             int rayonSommet = 10; // Rayon des sommets
 
-            Dictionary<string, PointF> positions = new Dictionary<string, PointF>();
-
+            // Calcul des positions à l'écran pour chaque station
             foreach (var station in carte.Stations)
             {
-                float x = (float)((station.Longitude - minLon) / (maxLon - minLon) * largeurEcran) + marge;
-                float y = (float)((1 - (station.Latitude - minLat) / (maxLat - minLat)) * hauteurEcran) + marge;
-                positions[station.IDstation] = new PointF(x, y);
+                // Calcul de la position X en fonction de la longitude
+                station.X = (float)((station.Longitude - minLon) / (maxLon - minLon) * largeurEcran) + marge;
+                // Calcul de la position Y en fonction de la latitude
+                station.Y = (float)((1 - (station.Latitude - minLat) / (maxLat - minLat)) * hauteurEcran) + marge;
             }
+
             // Dessiner les arcs
             foreach (var arc in carte.Arcs)
             {
-                PointF depart = positions[arc.Depart.IDstation];
-                PointF arrivee = positions[arc.Arrivee.IDstation];
+                // Récupérer les positions de départ et d'arrivée
+                PointF depart = new PointF(arc.Depart.X, arc.Depart.Y);
+                PointF arrivee = new PointF(arc.Arrivee.X, arc.Arrivee.Y);
 
-                // Calculer un nouveau point d'arrivée avant d'atteindre le sommet
-                PointF arriveeAjustee = ReculerPoint(arrivee, depart, rayonSommet);
+                // Calculer l'angle de la ligne reliant le départ à l'arrivée
+                double angle = Math.Atan2(arrivee.Y - depart.Y, arrivee.X - depart.X);
 
+                // Calculer la nouvelle position d'arrivée en reculant de la distance du rayon du sommet
+                PointF arriveeAjustee = new PointF(
+                    (float)(arrivee.X - rayonSommet * Math.Cos(angle)),
+                    (float)(arrivee.Y - rayonSommet * Math.Sin(angle))
+                );
+
+                // Dessiner la ligne de l'arc
                 Pen pen = new Pen(arc.CouleurLigne, 3);
                 g.DrawLine(pen, depart, arriveeAjustee);
-
-                // Dessiner la flèche sur le point ajusté
                 DessinerFleche(g, pen, depart, arriveeAjustee);
             }
 
-            /// Dessiner les sommets
+
+            // Dessiner les sommets
             foreach (var station in carte.Stations)
             {
-                PointF position = positions[station.IDstation];
+                PointF position = new PointF(station.X, station.Y);
                 Brush brush = Brushes.Gray;
                 g.FillEllipse(brush, position.X - rayonSommet, position.Y - rayonSommet, rayonSommet * 2, rayonSommet * 2);
 
@@ -99,7 +118,6 @@ namespace BTCook
                 PointF textPosition = new PointF(position.X - textSize.Width / 2, position.Y - textSize.Height / 2);
                 g.DrawString(nomAffiche, font, Brushes.Black, textPosition);
             }
-
 
         }
 
@@ -181,6 +199,26 @@ namespace BTCook
                 string resteNom = nom.Substring(8); // Enlève "Gare de "
                 return "Gar " + resteNom.Substring(0, Math.Min(4, resteNom.Length));
             }
+            if (nom.Contains("Saint-"))
+            {
+                string resteNom = nom.Substring(6); // Enlève "Saint-"
+                return "St-" + resteNom.Substring(0, Math.Min(4, resteNom.Length));
+            }
+            if (nom.Contains("La "))
+            {
+                string resteNom = nom.Substring(3); // Enlève "Saint-"
+                return "La " + resteNom.Substring(0, Math.Min(4, resteNom.Length));
+            }
+            if (nom.Contains("Le "))
+            {
+                string resteNom = nom.Substring(3); // Enlève "Saint-"
+                return "Le " + resteNom.Substring(0, Math.Min(4, resteNom.Length));
+            }
+            if (nom.Contains("Les "))
+            {
+                string resteNom = nom.Substring(4); // Enlève "Saint-"
+                return "Les " + resteNom.Substring(0, Math.Min(4, resteNom.Length));
+            }
 
             return nom.Substring(0, Math.Min(4, nom.Length));
         }
@@ -204,16 +242,5 @@ namespace BTCook
             g.DrawLine(pen, arrivee, p1);
             g.DrawLine(pen, arrivee, p2);
         }
-
-        // Méthode pour ajuster le point d'arrivée d'un arc
-        private PointF ReculerPoint(PointF arrivee, PointF depart, float distance)
-        {
-            double angle = Math.Atan2(arrivee.Y - depart.Y, arrivee.X - depart.X);
-            return new PointF(
-                (float)(arrivee.X - distance * Math.Cos(angle)),
-                (float)(arrivee.Y - distance * Math.Sin(angle))
-            );
-        }
-
     }
 }

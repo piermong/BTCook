@@ -15,17 +15,15 @@ public class Arc
     public Color CouleurLigne { get; set; } // Ajout de la couleur
 
 
-    public Arc(Station depart, Station arrivee, double temps)
+    public Arc(Station depart, Station arrivee, double temps, string ligne)
     {
         Depart = depart;
         Arrivee = arrivee;
-        string ligne = depart.DeterminerLigne();
-
-        Color couleurLigne = ObtenirCouleurLigne(ligne);
         Ligne = ligne;
+        Color couleurLigne = ObtenirCouleurLigne(Ligne);
         Distance = CalculerDistance(depart, arrivee);
         Temps = temps;
-        CouleurLigne = ObtenirCouleurLigne(ligne);
+        CouleurLigne = ObtenirCouleurLigne(Ligne);
     }
 
 
@@ -74,7 +72,6 @@ public class Arc
         double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
 
         return R * c; // Distance en kilomètres
-
     }
 
 }
