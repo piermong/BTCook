@@ -52,7 +52,12 @@ public class Arc
     }
 
 
-
+    /// <summary>
+    /// calcule la distance réél en km entre 2 stations
+    /// </summary>
+    /// <param name="s1"></param>
+    /// <param name="s2"></param>
+    /// <returns></returns>
     private double CalculerDistance(Station s1, Station s2)
     {
         const double R = 6371; // Rayon de la Terre en km
