@@ -32,13 +32,13 @@ namespace BTCook
         }
 
 
-        // Méthode pour ajouter une ligne à la station
-        public void AjouterLigne(string ligne)
+        public string DeterminerLigne()
         {
-            if (!listeLignes.Contains(ligne))
-            {
-                listeLignes.Add(ligne);
-            }
+            string ligne = "";
+            if (IDstation.Count() == 4) ligne = IDstation.Substring(0, 2);
+            else if (IDstation.Contains("bis")) ligne = IDstation[0] + "bis";
+            else ligne = IDstation[0].ToString();
+            return ligne;
         }
 
     }
