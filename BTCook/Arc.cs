@@ -26,7 +26,11 @@ public class Arc
         CouleurLigne = ObtenirCouleurLigne(Ligne);
     }
 
-
+    /// <summary>
+    /// cette classe attribue une couleur à une ligne
+    /// </summary>
+    /// <param name="ligne"></param>
+    /// <returns></returns>
     public static Color ObtenirCouleurLigne(string ligne)
     {
         switch (ligne)

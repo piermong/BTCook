@@ -22,6 +22,10 @@ namespace BTCook
             Arcs = new List<Arc>();
         }
 
+        /// <summary>
+        /// on remplit la liste des arcs et des staions en lisant le fichier csv et ses colonnes
+        /// </summary>
+        /// <param name="filePath"></param>
         public void ConstruireGraphe(string filePath)
         {
             using (StreamReader reader = new StreamReader(filePath, Encoding.UTF8))
@@ -117,7 +121,7 @@ namespace BTCook
                                 if (s.Nom == idTrim)
                                 {
                                     stationPrecedente = s;
-                                    break; // On arrête la boucle dès qu'on trouve la station
+                                    break; 
                                 }
                             }
 
@@ -149,7 +153,6 @@ namespace BTCook
                             }
 
                             // Trouver la ligne commune
-
                             if (!string.IsNullOrEmpty(ligne))
                             {
                                 // Créer l'arc avec la ligne commune
@@ -163,7 +166,6 @@ namespace BTCook
             }         
         }
         
-
         public void AfficherArcs()
         {
             foreach (Arc a in Arcs)
@@ -172,7 +174,12 @@ namespace BTCook
             }
         }
 
-
+        /// <summary>
+        /// retrouve 2 stations dans la liste Stations à partir du nom de la station
+        /// </summary>
+        /// <param name="departNom"></param>
+        /// <param name="arriveeNom"></param>
+        /// <returns></returns>
         public (Station , Station) RetrouveStation(string departNom, string arriveeNom)
         {
             if (departNom == "" || arriveeNom == ""|| departNom == arriveeNom)
@@ -195,6 +202,15 @@ namespace BTCook
             return(depart, arrivee);
         }
 
+
+        /// <summary>
+        /// l'algorithme de Dijkstra est composé d'une liste des stations non-visité qui doit être vide à la fin
+        /// une fois la station validé on remplit son précédent et on retrouve le chemin du point de départ au point d'arrivé 
+        /// à partir des précédents
+        /// </summary>
+        /// <param name="departNom"></param>
+        /// <param name="arriveeNom"></param>
+        /// <returns></returns>
         public List<Station> Dijkstra(string departNom, string arriveeNom)
         {
             // Recherche des stations par leur nom
@@ -232,7 +248,7 @@ namespace BTCook
                 if (stationCourante == arrivee)
                     break;
 
-                // 4. Retirer la station courante des stations non visitées
+                // 4. Retirer la station courante déjà visitées
                 stationNonVisitees.Remove(stationCourante);
 
                 // 5. Recherche des arcs adjacents
@@ -342,7 +358,6 @@ namespace BTCook
                 if (!modificationEffectuee)
                     break;
             }
-
             // 3. Reconstruction du chemin
             List<Station> cheminOptimal = new List<Station>();
             Station stationCourante = arrivee;
@@ -352,7 +367,6 @@ namespace BTCook
                 cheminOptimal.Insert(0, stationCourante);
                 stationCourante = stationCourante.StationPrécé;
             }
-
             return cheminOptimal;
         }
 
@@ -368,7 +382,6 @@ namespace BTCook
             }
             return "";
         }
-
 
         public void AfficherCheminOptimal(List<Station> cheminOptimal)
         {
