@@ -14,7 +14,13 @@ public class Arc
     public double Temps { get; set; }
     public Color CouleurLigne { get; set; } // Ajout de la couleur
 
-
+    /// <summary>
+    /// Initialise une nouvelle instance de la classe Arc.
+    /// </summary>
+    /// <param name="depart">La station de départ.</param>
+    /// <param name="arrivee">La station d'arrivée.</param>
+    /// <param name="temps">Le temps de trajet entre les deux stations.</param>
+    /// <param name="ligne">La ligne de métro.</param>
     public Arc(Station depart, Station arrivee, double temps, string ligne)
     {
         Depart = depart;
@@ -27,10 +33,10 @@ public class Arc
     }
 
     /// <summary>
-    /// cette classe attribue une couleur à une ligne
+    /// Obtient la couleur associée à une ligne de métro.
     /// </summary>
-    /// <param name="ligne"></param>
-    /// <returns></returns>
+    /// <param name="ligne">Le numéro de la ligne de métro.</param>
+    /// <returns>La couleur de la ligne.</returns>
     public static Color ObtenirCouleurLigne(string ligne)
     {
         switch (ligne)
@@ -55,13 +61,12 @@ public class Arc
         }
     }
 
-
     /// <summary>
-    /// calcule la distance réél en km entre 2 stations
+    /// Calcule la distance entre deux stations en utilisant la formule de Haversine.
     /// </summary>
-    /// <param name="s1"></param>
-    /// <param name="s2"></param>
-    /// <returns></returns>
+    /// <param name="s1">La première station.</param>
+    /// <param name="s2">La deuxième station.</param>
+    /// <returns>La distance en kilomètres.</returns>
     private double CalculerDistance(Station s1, Station s2)
     {
         const double R = 6371; // Rayon de la Terre en km
@@ -82,5 +87,4 @@ public class Arc
 
         return R * c; // Distance en kilomètres
     }
-
 }
